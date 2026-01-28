@@ -492,6 +492,7 @@ MonoBehaviour:
   moveAction: {fileID: -7861901079784698755, guid: 0893f75a3f3806b4db8ae5080cbcc24f, type: 3}
   jumpAction: {fileID: 5775848521388769486, guid: 0893f75a3f3806b4db8ae5080cbcc24f, type: 3}
   sprintAction: {fileID: -2973159541519097804, guid: 0893f75a3f3806b4db8ae5080cbcc24f, type: 3}
+  crouchAction: {fileID: 3439788813642883742, guid: 0893f75a3f3806b4db8ae5080cbcc24f, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
