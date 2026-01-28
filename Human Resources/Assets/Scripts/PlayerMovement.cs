@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     private float walkSpeed = 6.0f;
     private float sprintSpeed = 10.0f;
+    private float crouchSpeed = 2.0f;
     private float jumpHeight = 1.5f;
     private float gravityValue = -14.7f;
 
@@ -20,12 +21,14 @@ public class PlayerMovement : MonoBehaviour
     public InputActionReference moveAction;
     public InputActionReference jumpAction;
     public InputActionReference sprintAction;
+    public InputActionReference crouchAction;
 
     private void OnEnable()
     {
         moveAction.action.Enable();
         jumpAction.action.Enable();
         sprintAction.action.Enable();
+        crouchAction.action.Enable();
     }
 
     private void OnDisable()
@@ -33,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
         moveAction.action.Disable();
         jumpAction.action.Disable();
         sprintAction.action.Disable();
+        crouchAction.action.Disable();
     }
 
     void Update()
@@ -52,7 +56,23 @@ public class PlayerMovement : MonoBehaviour
         Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
 
         bool isSprinting = sprintAction.action.IsPressed();
-        float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
+        bool isCrouching = crouchAction.action.IsPressed();
+
+        float currentSpeed;
+
+        if(isCrouching)
+        {
+            currentSpeed = crouchSpeed;
+        }
+        else if (isSprinting)
+        {
+            currentSpeed = sprintSpeed;
+        }
+        else
+        {
+            currentSpeed = walkSpeed;
+        }
+
 
         if (direction.magnitude >= 0.1f)
         {
