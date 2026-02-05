@@ -11,14 +11,14 @@ public class EnemyDetection : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(transform.position, transform.forward, Color.green, Mathf.Infinity, true);
+        Debug.DrawRay(transform.position, transform.forward, Color.green);
 
         RaycastHit hit;
         if(Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, 10))
         {
-            Debug.DrawRay(transform.position, (player.transform.position - transform.position), Color.lavender);
             if (hit.transform == player.transform)
             {
+                Debug.DrawRay(transform.position, (player.transform.position - transform.position), Color.green);
                 isNotHidden = true;
             }
         }
