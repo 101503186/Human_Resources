@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private float patrolWaitTime = 2f;
     [SerializeField] private float stopAtDistance = 0.5f;
+    [SerializeField] private float followStopDistance = 3f;
 
     [SerializeField] private float detectionRange = 5f;
     [SerializeField] private float fieldOfView = 90f;
@@ -39,6 +40,12 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+        Vector3 leftAngle = Quaternion.Euler(0, -fieldOfView/2, 0) * transform.forward;
+        Vector3 rightAngle = Quaternion.Euler(0, fieldOfView/2, 0) * transform.forward;
+
+        Debug.DrawRay(transform.position, leftAngle * detectionRange, Color.yellow);
+        Debug.DrawRay(transform.position, rightAngle * detectionRange, Color.yellow);
+
         var distanceToPlayer = Vector3.Distance(player.position, transform.position);
 
         switch (enemyState)
@@ -74,7 +81,7 @@ public class EnemyController : MonoBehaviour
     private void Patrol()
     {
         if (isWaiting) return;
-        if (!agent.pathPending && agent.remainingDistance <= stopAtDistance)
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             StartCoroutine(WaitAtPatrolPoint());
         }
@@ -82,7 +89,11 @@ public class EnemyController : MonoBehaviour
 
     private void Follow()
     {
-        agent.SetDestination(player.position);
+        agent.stoppingDistance = followStopDistance;
+        if (Vector3.Distance(transform.position, player.position) > followStopDistance)
+        {
+            agent.SetDestination(player.position);
+        }
     }
 
     private IEnumerator WaitAtPatrolPoint()
@@ -101,13 +112,18 @@ public class EnemyController : MonoBehaviour
     {
         if (patrolPoints.Length == 0) return;
 
+        agent.stoppingDistance = stopAtDistance;
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
+
         currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
     }
 
     private void GoToClosestPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
+
+        agent.stoppingDistance = stopAtDistance;
+
         var closestIndex = 0;
         var closestDistance = float.MaxValue;
 
