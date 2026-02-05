@@ -2679,7 +2679,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1629792591}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.75
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2726,8 +2726,12 @@ MonoBehaviour:
   - {fileID: 1857332414}
   - {fileID: 1321284944}
   - {fileID: 1114116390}
+  player: {fileID: 659989051}
   patrolWaitTime: 2
   stopAtDistance: 0
+  detectionRange: 7.5
+  fieldOfView: 60
+  losePlayerTime: 2
 --- !u!1 &1746207180
 GameObject:
   m_ObjectHideFlags: 0
