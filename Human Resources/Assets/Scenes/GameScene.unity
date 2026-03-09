@@ -1388,6 +1388,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 80c67ddc-0c60-4982-8227-9d7f63fd3de0
     m_ActionName: 'Player/Aim[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 376a2bb7-a5f1-4819-bfb5-29cee14c5bac
+    m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -1440,6 +1444,7 @@ MonoBehaviour:
   sprintAction: {fileID: -7471211009204490832, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   crouchAction: {fileID: 7040659881675835329, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   aimAction: {fileID: 8740480818434938743, guid: 289c1b55c9541489481df5cc06664110, type: 3}
+  shootAction: {fileID: -3268231796868491558, guid: 289c1b55c9541489481df5cc06664110, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -3227,7 +3232,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1629792591}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d37b3d3c7502a424e8ffc069142bceeb, type: 3}
   m_Name: 
@@ -3258,9 +3263,10 @@ MonoBehaviour:
   patrolWaitTime: 2
   stopAtDistance: 0
   followStopDistance: 3
-  detectionRange: 7.5
+  detectionRange: 25
   fieldOfView: 60
   losePlayerTime: 2
+  spotPlayerTime: 8
 --- !u!1 &1746207180
 GameObject:
   m_ObjectHideFlags: 0
@@ -3766,13 +3772,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1878321020}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.21654439, y: -0, z: -0, w: 0.9762728}
+  m_LocalRotation: {x: 0.15920497, y: -0, z: -0, w: 0.98724556}
   m_LocalPosition: {x: 0, y: 0, z: -0.10000038}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1629792596}
-  m_LocalEulerAnglesHint: {x: 25.012, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 18.322, y: 0, z: 0}
 --- !u!114 &1878321022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3793,10 +3799,10 @@ MonoBehaviour:
   m_SoftShadowQuality: 0
   m_RenderingLayersMask:
     serializedVersion: 0
-    m_Bits: 1
+    m_Bits: 4294967295
   m_ShadowRenderingLayersMask:
     serializedVersion: 0
-    m_Bits: 1
+    m_Bits: 4294967295
   m_Version: 4
   m_LightLayerMask: 1
   m_ShadowLayerMask: 1
@@ -3813,8 +3819,8 @@ Light:
   serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_Intensity: 500
-  m_Range: 10
+  m_Intensity: 10000
+  m_Range: 25
   m_SpotAngle: 60
   m_InnerSpotAngle: 60
   m_CookieSize2D: {x: 0.5, y: 0.5}
