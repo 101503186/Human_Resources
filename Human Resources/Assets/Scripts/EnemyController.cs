@@ -6,7 +6,8 @@ using UnityEngine.AI;
 public enum EnemyState
 {
     Patrolling,
-    Following
+    Following,
+    Observing
 }
 
 public class EnemyController : MonoBehaviour
@@ -18,15 +19,18 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float stopAtDistance = 0.5f;
     [SerializeField] private float followStopDistance = 3f;
 
-    [SerializeField] private float detectionRange = 5f;
+    [SerializeField] private float detectionRange;
     [SerializeField] private float fieldOfView = 90f;
     [SerializeField] private float losePlayerTime = 3f;
+    [SerializeField] private float spotPlayerTime = 5f;
+    private float detectionSpeed = 1f;
 
     private NavMeshAgent agent;
     private int currentPatrolIndex;
     private bool isWaiting;
     private EnemyState enemyState = EnemyState.Patrolling;
     private float timeSinceLostPlayer;
+    private float timeSeeingPlayer;
 
     private void Awake()
     {
@@ -54,7 +58,7 @@ public class EnemyController : MonoBehaviour
                 Patrol();
                 if(distanceToPlayer <= detectionRange && CanSeePlayer())
                 {
-                    enemyState = EnemyState.Following;
+                    enemyState = EnemyState.Observing;
                 }
                 break;
 
@@ -62,6 +66,7 @@ public class EnemyController : MonoBehaviour
                 Follow();
                 if (!CanSeePlayer())
                 {
+                    timeSeeingPlayer = 0;
                     timeSinceLostPlayer += Time.deltaTime;
                     if(timeSinceLostPlayer >= losePlayerTime)
                     {
@@ -73,7 +78,14 @@ public class EnemyController : MonoBehaviour
                 {
                     timeSinceLostPlayer = 0f;
                 }
+                break;
 
+            case EnemyState.Observing:
+                timeSeeingPlayer += Time.deltaTime * DetectionSpeedMofidier();
+                if(timeSeeingPlayer >= spotPlayerTime)
+                {
+                    enemyState = EnemyState.Following;
+                }
                 break;
         }
     }
@@ -162,5 +174,17 @@ public class EnemyController : MonoBehaviour
         }
 
         return true;
+    }
+
+    private float DetectionSpeedMofidier()
+    {
+        float distanceToPlayer = Vector3.Distance(player.position, transform.position);
+
+        if (distanceToPlayer < detectionRange)
+        {
+            return detectionSpeed * (detectionRange / distanceToPlayer);
+        }
+
+        return detectionSpeed;
     }
 }

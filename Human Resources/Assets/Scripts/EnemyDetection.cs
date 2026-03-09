@@ -11,10 +11,8 @@ public class EnemyDetection : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(transform.position, transform.forward, Color.green);
-
         RaycastHit hit;
-        if(Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, 10))
+        if(Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, 25))
         {
             if (hit.transform == player.transform)
             {
