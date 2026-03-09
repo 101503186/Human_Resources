@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     public InputActionReference sprintAction;
     public InputActionReference crouchAction;
     public InputActionReference aimAction;
+    public InputActionReference shootAction;
 
     private void Start()
     {
@@ -41,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         sprintAction.action.Enable();
         crouchAction.action.Enable();
         aimAction.action.Enable();
+        shootAction.action.Enable();
     }
 
     private void OnDisable()
@@ -50,6 +52,7 @@ public class PlayerMovement : MonoBehaviour
         sprintAction.action.Disable();
         crouchAction.action.Disable();
         aimAction.action.Disable();
+        shootAction.action.Disable();
     }
 
     void Update()
@@ -78,7 +81,8 @@ public class PlayerMovement : MonoBehaviour
         bool isSprinting = sprintAction.action.IsPressed();
         bool isCrouching = crouchAction.action.IsPressed();
         bool isAiming = aimAction.action.IsPressed();
-        Vector3 aimOffset = new Vector3(1.0f,0.2f,0);
+        bool isShooting = shootAction.action.IsPressed();
+        Vector3 aimOffset = new Vector3(0.75f,-0.1f,2f);
 
         float currentSpeed;
 
@@ -104,6 +108,17 @@ public class PlayerMovement : MonoBehaviour
                      playerRoot.forward * aimOffset.z;
 
             playerRoot.position = basePosition + offset;
+
+            if (isShooting)
+            {
+                Vector3 forward = cam.forward;
+                RaycastHit hit;
+
+                if (Physics.Raycast(cam.position, forward, out hit, 100))
+                {
+                    Debug.DrawLine(cam.position, hit.point, Color.red, 0.1f);
+                }
+            }
         }
         else
         {
@@ -133,5 +148,16 @@ public class PlayerMovement : MonoBehaviour
         playerVelocity.y += gravityValue * Time.deltaTime;
 
         controller.Move(playerVelocity * Time.deltaTime);
+    }
+
+    void FixedUpdate()
+    {
+        //Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+        //Debug.DrawRay(cam.position, forward, Color.green);
+    }
+
+    void Shooting()
+    {
+        Debug.Log("Shot");
     }
 }
