@@ -2001,7 +2001,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 967540314}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.045739185, y: 0.0000000015844264, z: -7.254628e-11, w: 0.99895346}
+  m_LocalRotation: {x: 0.04573918, y: 0.000000013467479, z: -6.1663674e-10, w: 0.99895346}
   m_LocalPosition: {x: 0, y: 5.175363, z: -4.0047655}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2387,7 +2387,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1183781015}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.045739174, y: 0.0000000015877121, z: -1.4431469e-10, w: 0.99895346}
+  m_LocalRotation: {x: 0.04573917, y: 0.000000013467477, z: -6.1663663e-10, w: 0.99895346}
   m_LocalPosition: {x: 0, y: 1.3953631, z: -4.0047655}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3260,13 +3260,15 @@ MonoBehaviour:
   - {fileID: 1321284944}
   - {fileID: 1114116390}
   player: {fileID: 659989051}
-  patrolWaitTime: 2
+  patrolWaitTime: 5
   stopAtDistance: 0
   followStopDistance: 3
   detectionRange: 25
   fieldOfView: 60
+  rotationSpeed: 1
   losePlayerTime: 2
-  spotPlayerTime: 8
+  spotPlayerTime: 2.25
+  timeWaited: 0
 --- !u!1 &1746207180
 GameObject:
   m_ObjectHideFlags: 0

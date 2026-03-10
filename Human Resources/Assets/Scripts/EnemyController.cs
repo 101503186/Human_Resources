@@ -21,9 +21,11 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private float detectionRange;
     [SerializeField] private float fieldOfView = 90f;
+    [SerializeField] private float rotationSpeed = 1f;
     [SerializeField] private float losePlayerTime = 3f;
     [SerializeField] private float spotPlayerTime = 5f;
     private float detectionSpeed = 1f;
+    public float timeWaited;
 
     private NavMeshAgent agent;
     private int currentPatrolIndex;
@@ -92,32 +94,46 @@ public class EnemyController : MonoBehaviour
 
     private void Patrol()
     {
-        if (isWaiting) return;
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
-            StartCoroutine(WaitAtPatrolPoint());
+            WaitAtPatrolPoint();
         }
     }
 
     private void Follow()
     {
+        isWaiting = false;
+        agent.isStopped = false;
         agent.stoppingDistance = followStopDistance;
+
+        float singleStep = rotationSpeed * Time.deltaTime;
+        Vector3 playerDir = player.position - transform.position;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, playerDir, singleStep, 0.0f);
+        transform.rotation = Quaternion.LookRotation(newDir);
+
         if (Vector3.Distance(transform.position, player.position) > followStopDistance)
         {
             agent.SetDestination(player.position);
         }
     }
 
-    private IEnumerator WaitAtPatrolPoint()
+    private void WaitAtPatrolPoint()
     {
-        isWaiting = true;
-        agent.isStopped = true;
+        if (!isWaiting)
+        {
+            isWaiting = true;
+            agent.isStopped = true;
+        }
 
-        yield return new WaitForSeconds(patrolWaitTime);
-
-        agent.isStopped = false;
-        GoToNextPatrolPoint();
-        isWaiting = false;
+        timeWaited += Time.deltaTime;
+                                        
+        if (timeWaited >= patrolWaitTime)
+        {
+            agent.isStopped = false;
+            GoToNextPatrolPoint();
+            isWaiting = false;
+            timeWaited = 0f;
+        }
     }
 
     private void GoToNextPatrolPoint()
