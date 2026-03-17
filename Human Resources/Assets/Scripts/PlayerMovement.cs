@@ -18,10 +18,6 @@ public class PlayerMovement : MonoBehaviour
     private bool groundedPlayer;
     [SerializeField] private GameObject playerObject;
 
-    [SerializeField] Transform playerRoot;
-    private Vector3 playerRootOriginalSpot;
-
-
     [Header("Input Actions")]
     public InputActionReference moveAction;
     public InputActionReference jumpAction;
@@ -29,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     public InputActionReference crouchAction;
     public InputActionReference aimAction;
     public InputActionReference shootAction;
+
+    public bool isAiming;
+    [SerializeField] private Transform vfxSplatter;
 
     private void Start()
     {
@@ -64,8 +63,6 @@ public class PlayerMovement : MonoBehaviour
         camForward.y = 0f;
         camForward.Normalize();
 
-        playerRoot.rotation = Quaternion.LookRotation(camForward);
-
         if (groundedPlayer)
         {
             if (playerVelocity.y < -2f)
@@ -80,8 +77,8 @@ public class PlayerMovement : MonoBehaviour
 
         bool isSprinting = sprintAction.action.IsPressed();
         bool isCrouching = crouchAction.action.IsPressed();
-        bool isAiming = aimAction.action.IsPressed();
-        bool isShooting = shootAction.action.IsPressed();
+        isAiming = aimAction.action.IsPressed();
+        bool isShooting = shootAction.action.WasPressedThisFrame();
         Vector3 aimOffset = new Vector3(0.75f,-0.1f,2f);
 
         float currentSpeed;
@@ -103,12 +100,6 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(camForward);
 
-            Vector3 offset = playerRoot.right * aimOffset.x +
-                     playerRoot.up * aimOffset.y +
-                     playerRoot.forward * aimOffset.z;
-
-            playerRoot.position = basePosition + offset;
-
             if (isShooting)
             {
                 Vector3 forward = cam.forward;
@@ -117,12 +108,11 @@ public class PlayerMovement : MonoBehaviour
                 if (Physics.Raycast(cam.position, forward, out hit, 100))
                 {
                     Debug.DrawLine(cam.position, hit.point, Color.red, 0.1f);
+                    Instantiate(vfxSplatter, hit.point, Quaternion.identity);
                 }
+
+                isShooting = false;
             }
-        }
-        else
-        {
-            playerRoot.position = basePosition;
         }
 
         if (direction.magnitude >= 0.1f)
