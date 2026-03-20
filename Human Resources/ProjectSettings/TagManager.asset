@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 3
   tags:
   - isWall
+  - EnemyHead
+  - EnemyBody
+  - PlayerSpawn
+  - VIP
   layers:
   - Default
   - TransparentFX
@@ -13,7 +17,7 @@ TagManager:
   - Water
   - UI
   - isWall
-  - 
+  - PlayerSpawn
   - 
   - 
   - PostProcessing
