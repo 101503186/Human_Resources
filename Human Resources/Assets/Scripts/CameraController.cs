@@ -9,11 +9,6 @@ public class CameraController : MonoBehaviour
     [SerializeField] private RawImage crosshairImage;
     public PlayerMovement player;
 
-    private void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-
     private void Update()
     {
         if (player.isAiming)
