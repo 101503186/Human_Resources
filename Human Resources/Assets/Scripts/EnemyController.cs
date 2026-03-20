@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 
 public enum EnemyState
 {
     Patrolling,
-    Following,
-    Observing
+    Attacking,
+    Observing,
 }
 
 public class EnemyController : MonoBehaviour
@@ -15,28 +13,40 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private Transform[] patrolPoints;
     [SerializeField] private Transform player;
 
+    [Header("Patrolling Settings")]
     [SerializeField] private float patrolWaitTime = 2f;
     [SerializeField] private float stopAtDistance = 0.5f;
     [SerializeField] private float followStopDistance = 3f;
 
+    [Header("Detection Settings")]
     [SerializeField] private float detectionRange;
     [SerializeField] private float fieldOfView = 90f;
     [SerializeField] private float rotationSpeed = 1f;
     [SerializeField] private float losePlayerTime = 3f;
     [SerializeField] private float spotPlayerTime = 5f;
     private float detectionSpeed = 1f;
-    public float timeWaited;
-
-    private NavMeshAgent agent;
+    
+    private float timeWaited;
     private int currentPatrolIndex;
     private bool isWaiting;
     private EnemyState enemyState = EnemyState.Patrolling;
     private float timeSinceLostPlayer;
     private float timeSeeingPlayer;
 
+    public MonoBehaviour scriptToDisable;
+    public Rigidbody rb;
+    public Light detectionLight;
+    private NavMeshAgent agent;
+    private bool isAlive = true;
+    private float healthPoints = 2f;
+
+    public Transform barrelOpening;
+    private EnemyGunScript enemyGun;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        enemyGun = GetComponentInChildren<EnemyGunScript>();
     }
 
     private void Start()
@@ -54,41 +64,45 @@ public class EnemyController : MonoBehaviour
 
         var distanceToPlayer = Vector3.Distance(player.position, transform.position);
 
-        switch (enemyState)
+        if (isAlive)
         {
-            case EnemyState.Patrolling:
-                Patrol();
-                if(distanceToPlayer <= detectionRange && CanSeePlayer())
-                {
-                    enemyState = EnemyState.Observing;
-                }
-                break;
-
-            case EnemyState.Following:
-                Follow();
-                if (!CanSeePlayer())
-                {
-                    timeSeeingPlayer = 0;
-                    timeSinceLostPlayer += Time.deltaTime;
-                    if(timeSinceLostPlayer >= losePlayerTime)
+            switch (enemyState)
+            {
+                case EnemyState.Patrolling:
+                    Patrol();
+                    if (distanceToPlayer <= detectionRange && CanSeePlayer() && PlayerHealth.playerHealthScript.playerIsAlive)
                     {
-                        enemyState = EnemyState.Patrolling;
-                        GoToClosestPatrolPoint();
+                        enemyState = EnemyState.Observing;
                     }
-                }
-                else
-                {
-                    timeSinceLostPlayer = 0f;
-                }
-                break;
+                    break;
 
-            case EnemyState.Observing:
-                timeSeeingPlayer += Time.deltaTime * DetectionSpeedMofidier();
-                if(timeSeeingPlayer >= spotPlayerTime)
-                {
-                    enemyState = EnemyState.Following;
-                }
-                break;
+                case EnemyState.Attacking:
+                    Follow();
+                    if (!CanSeePlayer() || !PlayerHealth.playerHealthScript.playerIsAlive)
+                    {
+                        timeSeeingPlayer = 0;
+                        timeSinceLostPlayer += Time.deltaTime;
+                        if (timeSinceLostPlayer >= losePlayerTime)
+                        {
+                            enemyState = EnemyState.Patrolling;
+                            GoToClosestPatrolPoint();
+                        }
+                    }
+                    else
+                    {
+                        timeSinceLostPlayer = 0f;
+                        enemyGun.Shoot(barrelOpening);
+                    }
+                    break;
+
+                case EnemyState.Observing:
+                    timeSeeingPlayer += Time.deltaTime * DetectionSpeedMofidier();
+                    if (timeSeeingPlayer >= spotPlayerTime)
+                    {
+                        enemyState = EnemyState.Attacking;
+                    }
+                    break;
+            }
         }
     }
 
@@ -202,5 +216,43 @@ public class EnemyController : MonoBehaviour
         }
 
         return detectionSpeed;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        if (!isAlive) return;
+
+        healthPoints -= damage;
+
+        if(healthPoints <= 0f)
+        {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        Debug.Log("Died: " + gameObject.name);
+        Debug.Log("Root tag: " + transform.root.tag);
+
+        Transform[] children = GetComponentsInChildren<Transform>();
+
+        foreach (Transform child in children)
+        {
+            if (child.CompareTag("VIP"))
+            {
+                GameManager.Instance.vipIsDead = true;
+                Debug.Log("VIP Killed");
+                break;
+            }
+        }
+
+        if (scriptToDisable != null) scriptToDisable.enabled = false;
+        
+        if (agent != null) agent.enabled = false;
+        
+        if (rb != null) rb.constraints = RigidbodyConstraints.None;
+        
+        if(detectionLight != null) detectionLight.enabled = false;
     }
 }
