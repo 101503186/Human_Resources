@@ -27,11 +27,18 @@ public class PlayerMovement : MonoBehaviour
     public InputActionReference shootAction;
 
     public bool isAiming;
-    [SerializeField] private Transform vfxSplatter;
+
+    [Header("Gun")]
+    [SerializeField] private GameObject bulletHolePrefab;
+    [SerializeField] private ParticleSystem muzzleFlash;
+    [SerializeField] private Transform barrelOpening;
+    [SerializeField] private AudioSource audioSource;
+    public AudioClip gunShotClip;
 
     private void Start()
     {
-
+        audioSource = GetComponent<AudioSource>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void OnEnable()
@@ -102,13 +109,63 @@ public class PlayerMovement : MonoBehaviour
 
             if (isShooting)
             {
+                Instantiate(muzzleFlash, barrelOpening);
+                audioSource.PlayOneShot(gunShotClip);
+
                 Vector3 forward = cam.forward;
                 RaycastHit hit;
 
                 if (Physics.Raycast(cam.position, forward, out hit, 100))
                 {
                     Debug.DrawLine(cam.position, hit.point, Color.red, 0.1f);
-                    Instantiate(vfxSplatter, hit.point, Quaternion.identity);
+
+                    GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point, Quaternion.identity);
+
+                    // Align with surface
+                    bulletHole.transform.rotation = Quaternion.LookRotation(hit.normal) * Quaternion.Euler(90, 0, 0);
+
+                    // Offset slightly to prevent z-fighting
+                    bulletHole.transform.position += hit.normal * 0.001f;
+
+                    // Parent to object so it moves with it
+                    if (hit.rigidbody != null)
+                    {
+                        bulletHole.transform.SetParent(hit.rigidbody.transform);
+                    }
+                    else
+                    {
+                        bulletHole.transform.SetParent(hit.collider.transform);
+                    }
+                    Destroy(bulletHole, 30f);
+
+                    Rigidbody rb = hit.rigidbody;
+
+                    if (hit.collider.CompareTag("EnemyBody"))
+                    {
+                        EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                        if (enemy != null)
+                        {
+                            enemy.TakeDamage(1);
+                        }
+                    }
+                    if (hit.collider.CompareTag("EnemyHead"))
+                    {
+                        EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                        if (enemy != null)
+                        {
+                            enemy.TakeDamage(2);
+                        }
+                    }
+
+                    if (rb != null)
+                    {
+                        Vector3 forceDirection = (hit.point - cam.position).normalized;
+
+                        float forceAmount = 60f;
+
+                        //Applies force away from where bullet landed
+                        rb.AddForceAtPosition(forceDirection * forceAmount, hit.point, ForceMode.Impulse);
+                    }
                 }
 
                 isShooting = false;
