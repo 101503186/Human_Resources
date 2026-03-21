@@ -1,0 +1,18 @@
+How to play: WASD to move, shift to run, mouse to move camera, right mouse to aim and left mouse to shoot
+
+Current features:
+- Player can move (walking and sprinting) and look wherever they want while moving.
+- Player can aim and shoot at enemies.
+- Main menu with start, instructions, and quit buttons.
+- Simple level containing 8 enemies, and 1 VIP enemy. The player has to kill the VIP enemy in order to be able to complete the level. When level is either completed or lost, player is prompted with the option to either replay/retry, or quit to main menu.
+- Basic enemy AI:
+	- 3 different states:
+		- Patrolling: goes to each patrol point on its route, stopping at each one for a few seconds before continuing.
+		- Observing: when the player is inside enemy FOV and LOS, a timer on the enemy goes up, making the enemy follow and attack the player once the timer fills up. Timer fill rate increases the closer the player is to the enemy.
+		- Attacking: when the player is inside enemy FOV and LOS, enemy will engage the player and shoot and the player. The enemy has a set amount of shots it can make before needing to reload. While player is out of sight, a timer tracking how long it hasn't seen the player goes up. Once the timer is filled, it goes back to patrolling, continuing it's patrol route starting from the nearest patrol point. Similar timer exists on OBSERVING state.
+	- Enemy has 2 hp - enemy's head takes 2 damage, and body takes 1 shot.
+
+Future features:
+- Level selection menu
+- Improved level (completion right now takes at most 30 seconds, optimally level completion should take several minutes during first attempt): increased size, increase amount of enemies. Potentially interactable environment further down the road.
+- Complete asset update: animations, models, sounds. 
